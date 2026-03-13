@@ -2,13 +2,15 @@ export async function onRequest(context) {
 
 const url = new URL(context.request.url)
 
-if(!url.pathname.startsWith("/service/")){
+// /service/ 以外は通常ページ
+if (!url.pathname.startsWith("/service/")) {
 return context.next()
 }
 
-try{
+try {
 
-const target = atob(url.pathname.replace("/service/",""))
+const encoded = url.pathname.replace("/service/","")
+const target = atob(encoded)
 
 const response = await fetch(target,{
 headers:{
@@ -17,16 +19,16 @@ headers:{
 })
 
 return new Response(response.body,{
-status:response.status,
+status: response.status,
 headers:{
-"content-type":response.headers.get("content-type") || "text/html",
+"content-type": response.headers.get("content-type") || "text/html",
 "access-control-allow-origin":"*"
 }
 })
 
-}catch(e){
+} catch(e){
 
-return new Response("Proxy Error")
+return new Response("Proxy Error: "+e)
 
 }
 
